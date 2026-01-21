@@ -1,7 +1,10 @@
 'use client'
 
 import React, { useState } from 'react';
-import { ChevronRight, ChevronLeft, Check } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Check, LogOut } from 'lucide-react';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import { useAuth } from '@/contexts/AuthContext';
+import Image from 'next/image';
 
 type MealType = 'breakfast' | 'lunch' | 'dinner';
 
@@ -19,6 +22,11 @@ interface MenuSection {
 type Selections = Record<MealType, Record<string, boolean>>;
 
 const MaaKhanaSurvey = () => {
+  const { user, signOut } = useAuth();
+  if (!user) {
+    return null;
+  }
+  console.log(user);
   const [currentStep, setCurrentStep] = useState(0);
   const [selections, setSelections] = useState<Selections>({
     breakfast: {},
@@ -108,8 +116,8 @@ const MaaKhanaSurvey = () => {
         .filter(([_, selected]) => selected)
         .map(([key]) => menuData.dinner.items[key].name)
     };
-    
-    alert('Survey Complete!\n\nYour favorites:\n' + 
+
+    alert('Survey Complete!\n\nYour favorites:\n' +
       `Breakfast: ${results.breakfast.join(', ') || 'None selected'}\n` +
       `Lunch: ${results.lunch.join(', ') || 'None selected'}\n` +
       `Dinner: ${results.dinner.join(', ') || 'None selected'}`
@@ -120,13 +128,60 @@ const MaaKhanaSurvey = () => {
     return Object.values(selections[mealType]).filter(Boolean).length;
   };
 
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-yellow-50">
       {/* Header */}
       <div className="bg-white shadow-sm border-b border-orange-100">
         <div className="max-w-4xl mx-auto px-4 py-6">
-          <h1 className="text-3xl font-bold text-orange-600">MaaKhana</h1>
-          <p className="text-gray-600 mt-1">Home-style meals, delivered fresh</p>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Image
+                src="/maa_khaana.png"
+                alt="MaaKhana Logo"
+                width={60}
+                height={60}
+                className="object-contain"
+              />
+              <div>
+                <h1 className="text-3xl font-bold text-orange-600">MaaKhana</h1>
+                <p className="text-gray-600 mt-1">Home-style meals, delivered fresh</p>
+              </div>
+            </div>
+            {user && (
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3">
+
+                  {user.photoURL && (
+                    <img
+                      src={user.photoURL}
+                      alt={user.displayName || 'User'}
+                      className="w-10 h-10 rounded-full border-2 border-orange-300"
+                    />
+                  )}
+                  <div className="hidden md:block text-right">
+                    <p className="text-sm font-semibold text-gray-800">{user.displayName}</p>
+                    <p className="text-xs text-gray-500">{user.email}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={handleSignOut}
+                  className="flex items-center gap-2 px-4 py-2 bg-orange-100 text-orange-600 rounded-lg font-medium hover:bg-orange-200 transition-all"
+                  title="Sign out"
+                >
+                  <LogOut size={18} />
+                  <span className="hidden sm:inline">Sign out</span>
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -136,25 +191,22 @@ const MaaKhanaSurvey = () => {
           {steps.map((step, index) => (
             <React.Fragment key={step}>
               <div className="flex flex-col items-center">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all ${
-                  index < currentStep 
-                    ? 'bg-green-500 text-white' 
-                    : index === currentStep 
-                    ? 'bg-orange-500 text-white' 
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all ${index < currentStep
+                  ? 'bg-green-500 text-white'
+                  : index === currentStep
+                    ? 'bg-orange-500 text-white'
                     : 'bg-gray-200 text-gray-500'
-                }`}>
+                  }`}>
                   {index < currentStep ? <Check size={20} /> : index + 1}
                 </div>
-                <span className={`text-sm mt-2 font-medium capitalize ${
-                  index === currentStep ? 'text-orange-600' : 'text-gray-500'
-                }`}>
+                <span className={`text-sm mt-2 font-medium capitalize ${index === currentStep ? 'text-orange-600' : 'text-gray-500'
+                  }`}>
                   {step}
                 </span>
               </div>
               {index < steps.length - 1 && (
-                <div className={`flex-1 h-1 mx-4 rounded transition-all ${
-                  index < currentStep ? 'bg-green-500' : 'bg-gray-200'
-                }`} />
+                <div className={`flex-1 h-1 mx-4 rounded transition-all ${index < currentStep ? 'bg-green-500' : 'bg-gray-200'
+                  }`} />
               )}
             </React.Fragment>
           ))}
@@ -178,16 +230,15 @@ const MaaKhanaSurvey = () => {
             {Object.entries(currentMenu.items).map(([itemKey, meal]) => {
               const isSelected = selections[currentMealType][itemKey];
               const showDay = currentMealType === 'breakfast';
-              
+
               return (
                 <div
                   key={itemKey}
                   onClick={() => handleSelection(itemKey, !isSelected)}
-                  className={`border-2 rounded-xl p-5 cursor-pointer transition-all hover:shadow-md ${
-                    isSelected 
-                      ? 'border-orange-500 bg-orange-50 shadow-sm' 
-                      : 'border-gray-200 hover:border-orange-300'
-                  }`}
+                  className={`border-2 rounded-xl p-5 cursor-pointer transition-all hover:shadow-md ${isSelected
+                    ? 'border-orange-500 bg-orange-50 shadow-sm'
+                    : 'border-gray-200 hover:border-orange-300'
+                    }`}
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
@@ -205,11 +256,10 @@ const MaaKhanaSurvey = () => {
                         {meal.description}
                       </p>
                     </div>
-                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 ml-4 transition-all ${
-                      isSelected 
-                        ? 'border-orange-500 bg-orange-500' 
-                        : 'border-gray-300'
-                    }`}>
+                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 ml-4 transition-all ${isSelected
+                      ? 'border-orange-500 bg-orange-500'
+                      : 'border-gray-300'
+                      }`}>
                       {isSelected && <Check size={16} className="text-white" />}
                     </div>
                   </div>
@@ -224,11 +274,10 @@ const MaaKhanaSurvey = () => {
           <button
             onClick={handlePrevious}
             disabled={currentStep === 0}
-            className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all ${
-              currentStep === 0
-                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                : 'bg-white border-2 border-orange-500 text-orange-600 hover:bg-orange-50'
-            }`}
+            className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all ${currentStep === 0
+              ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+              : 'bg-white border-2 border-orange-500 text-orange-600 hover:bg-orange-50'
+              }`}
           >
             <ChevronLeft size={20} />
             Previous
@@ -265,4 +314,10 @@ const MaaKhanaSurvey = () => {
   );
 };
 
-export default MaaKhanaSurvey;
+export default function Page() {
+  return (
+    <ProtectedRoute>
+      <MaaKhanaSurvey />
+    </ProtectedRoute>
+  );
+}
