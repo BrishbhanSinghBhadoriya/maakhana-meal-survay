@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react';
-import { ChevronRight, ChevronLeft, Check, LogOut } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Check, LogOut, Loader2 } from 'lucide-react';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { useAuth } from '@/contexts/AuthContext';
 import Image from 'next/image';
@@ -38,6 +38,7 @@ const MaaKhanaSurvey = () => {
     dinner: {}
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [submittedData, setSubmittedData] = useState<any>(null);
 
   // Breakfast Menu (Same for all subscription types)
@@ -222,7 +223,7 @@ const MaaKhanaSurvey = () => {
 
   const handleSelection = (itemKey: string, isSelected: boolean) => {
     if (!currentMealType) return;
-    
+
     setSelections(prev => ({
       ...prev,
       [currentMealType]: {
@@ -247,6 +248,8 @@ const MaaKhanaSurvey = () => {
   };
 
   const handleSubmit = async () => {
+    setIsSubmitting(true);
+
     const breakfastAnswers = Object.entries(selections.breakfast)
       .filter(([_, selected]) => selected)
       .map(([key]) => {
@@ -322,6 +325,8 @@ const MaaKhanaSurvey = () => {
     } catch (error) {
       console.error('Error submitting survey:', error);
       alert('Failed to submit survey. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -645,19 +650,17 @@ const MaaKhanaSurvey = () => {
                 {/* Standard Veg */}
                 <div
                   onClick={() => setSubscriptionType('Standard Veg')}
-                  className={`border-2 rounded-xl p-6 cursor-pointer transition-all hover:shadow-md ${
-                    subscriptionType === 'Standard Veg'
-                      ? 'border-green-500 bg-green-50 shadow-sm'
-                      : 'border-gray-200 hover:border-green-300'
-                  }`}
+                  className={`border-2 rounded-xl p-6 cursor-pointer transition-all hover:shadow-md ${subscriptionType === 'Standard Veg'
+                    ? 'border-green-500 bg-green-50 shadow-sm'
+                    : 'border-gray-200 hover:border-green-300'
+                    }`}
                 >
                   <div className="flex items-start justify-between mb-3">
                     <h3 className="text-xl font-bold text-gray-800">Standard Veg</h3>
-                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${
-                      subscriptionType === 'Standard Veg'
-                        ? 'border-green-500 bg-green-500'
-                        : 'border-gray-300'
-                    }`}>
+                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${subscriptionType === 'Standard Veg'
+                      ? 'border-green-500 bg-green-500'
+                      : 'border-gray-300'
+                      }`}>
                       {subscriptionType === 'Standard Veg' && <Check size={16} className="text-white" />}
                     </div>
                   </div>
@@ -668,19 +671,17 @@ const MaaKhanaSurvey = () => {
                 {/* Standard Non-Veg */}
                 <div
                   onClick={() => setSubscriptionType('Standard Non-Veg')}
-                  className={`border-2 rounded-xl p-6 cursor-pointer transition-all hover:shadow-md ${
-                    subscriptionType === 'Standard Non-Veg'
-                      ? 'border-orange-500 bg-orange-50 shadow-sm'
-                      : 'border-gray-200 hover:border-orange-300'
-                  }`}
+                  className={`border-2 rounded-xl p-6 cursor-pointer transition-all hover:shadow-md ${subscriptionType === 'Standard Non-Veg'
+                    ? 'border-orange-500 bg-orange-50 shadow-sm'
+                    : 'border-gray-200 hover:border-orange-300'
+                    }`}
                 >
                   <div className="flex items-start justify-between mb-3">
                     <h3 className="text-xl font-bold text-gray-800">Standard Non-Veg</h3>
-                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${
-                      subscriptionType === 'Standard Non-Veg'
-                        ? 'border-orange-500 bg-orange-500'
-                        : 'border-gray-300'
-                    }`}>
+                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${subscriptionType === 'Standard Non-Veg'
+                      ? 'border-orange-500 bg-orange-500'
+                      : 'border-gray-300'
+                      }`}>
                       {subscriptionType === 'Standard Non-Veg' && <Check size={16} className="text-white" />}
                     </div>
                   </div>
@@ -691,19 +692,17 @@ const MaaKhanaSurvey = () => {
                 {/* Gym Bro Veg */}
                 <div
                   onClick={() => setSubscriptionType('Gym Bro Veg')}
-                  className={`border-2 rounded-xl p-6 cursor-pointer transition-all hover:shadow-md ${
-                    subscriptionType === 'Gym Bro Veg'
-                      ? 'border-purple-500 bg-purple-50 shadow-sm'
-                      : 'border-gray-200 hover:border-purple-300'
-                  }`}
+                  className={`border-2 rounded-xl p-6 cursor-pointer transition-all hover:shadow-md ${subscriptionType === 'Gym Bro Veg'
+                    ? 'border-purple-500 bg-purple-50 shadow-sm'
+                    : 'border-gray-200 hover:border-purple-300'
+                    }`}
                 >
                   <div className="flex items-start justify-between mb-3">
                     <h3 className="text-xl font-bold text-gray-800">Gym Bro Pack Veg</h3>
-                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${
-                      subscriptionType === 'Gym Bro Veg'
-                        ? 'border-purple-500 bg-purple-500'
-                        : 'border-gray-300'
-                    }`}>
+                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${subscriptionType === 'Gym Bro Veg'
+                      ? 'border-purple-500 bg-purple-500'
+                      : 'border-gray-300'
+                      }`}>
                       {subscriptionType === 'Gym Bro Veg' && <Check size={16} className="text-white" />}
                     </div>
                   </div>
@@ -714,19 +713,17 @@ const MaaKhanaSurvey = () => {
                 {/* Gym Bro Non-Veg */}
                 <div
                   onClick={() => setSubscriptionType('Gym Bro Non-Veg')}
-                  className={`border-2 rounded-xl p-6 cursor-pointer transition-all hover:shadow-md ${
-                    subscriptionType === 'Gym Bro Non-Veg'
-                      ? 'border-red-500 bg-red-50 shadow-sm'
-                      : 'border-gray-200 hover:border-red-300'
-                  }`}
+                  className={`border-2 rounded-xl p-6 cursor-pointer transition-all hover:shadow-md ${subscriptionType === 'Gym Bro Non-Veg'
+                    ? 'border-red-500 bg-red-50 shadow-sm'
+                    : 'border-gray-200 hover:border-red-300'
+                    }`}
                 >
                   <div className="flex items-start justify-between mb-3">
                     <h3 className="text-xl font-bold text-gray-800">Gym Bro Pack Non-Veg</h3>
-                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${
-                      subscriptionType === 'Gym Bro Non-Veg'
-                        ? 'border-red-500 bg-red-500'
-                        : 'border-gray-300'
-                    }`}>
+                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${subscriptionType === 'Gym Bro Non-Veg'
+                      ? 'border-red-500 bg-red-500'
+                      : 'border-gray-300'
+                      }`}>
                       {subscriptionType === 'Gym Bro Non-Veg' && <Check size={16} className="text-white" />}
                     </div>
                   </div>
@@ -759,11 +756,10 @@ const MaaKhanaSurvey = () => {
                     <div
                       key={itemKey}
                       onClick={() => handleSelection(itemKey, !isSelected)}
-                      className={`border-2 rounded-xl p-5 cursor-pointer transition-all hover:shadow-md ${
-                        isSelected
-                          ? 'border-orange-500 bg-orange-50 shadow-sm'
-                          : 'border-gray-200 hover:border-orange-300'
-                      }`}
+                      className={`border-2 rounded-xl p-5 cursor-pointer transition-all hover:shadow-md ${isSelected
+                        ? 'border-orange-500 bg-orange-50 shadow-sm'
+                        : 'border-gray-200 hover:border-orange-300'
+                        }`}
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
@@ -779,11 +775,10 @@ const MaaKhanaSurvey = () => {
                             {meal.description}
                           </p>
                         </div>
-                        <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 ml-4 transition-all ${
-                          isSelected
-                            ? 'border-orange-500 bg-orange-500'
-                            : 'border-gray-300'
-                        }`}>
+                        <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 ml-4 transition-all ${isSelected
+                          ? 'border-orange-500 bg-orange-500'
+                          : 'border-gray-300'
+                          }`}>
                           {isSelected && <Check size={16} className="text-white" />}
                         </div>
                       </div>
@@ -812,20 +807,32 @@ const MaaKhanaSurvey = () => {
           {currentStep === steps.length - 1 ? (
             <button
               onClick={handleSubmit}
-              className="flex items-center gap-2 px-8 py-3 bg-green-500 text-white rounded-lg font-semibold hover:bg-green-600 transition-all shadow-md hover:shadow-lg"
+              disabled={isSubmitting}
+              className={`flex items-center gap-2 px-8 py-3 rounded-lg font-semibold transition-all shadow-md hover:shadow-lg ${isSubmitting
+                  ? 'bg-green-400 text-white cursor-not-allowed'
+                  : 'bg-green-500 text-white hover:bg-green-600'
+                }`}
             >
-              Submit Survey
-              <Check size={20} />
+              {isSubmitting ? (
+                <>
+                  Submitting...
+                  <Loader2 size={20} className="animate-spin" />
+                </>
+              ) : (
+                <>
+                  Submit Survey
+                  <Check size={20} />
+                </>
+              )}
             </button>
           ) : (
             <button
               onClick={handleNext}
               disabled={currentStepType === 'subscription' && !subscriptionType}
-              className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all shadow-md hover:shadow-lg ${
-                currentStepType === 'subscription' && !subscriptionType
-                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  : 'bg-orange-500 text-white hover:bg-orange-600'
-              }`}
+              className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all shadow-md hover:shadow-lg ${currentStepType === 'subscription' && !subscriptionType
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : 'bg-orange-500 text-white hover:bg-orange-600'
+                }`}
             >
               Next
               <ChevronRight size={20} />
